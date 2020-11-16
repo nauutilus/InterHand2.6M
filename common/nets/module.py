@@ -46,10 +46,12 @@ class PoseNet(nn.Module):
 
     def forward(self, img_feat):
         joint_img_feat_1 = self.joint_deconv_1(img_feat)
-        joint_heatmap3d_1 = self.joint_conv_1(joint_img_feat_1).view(-1,self.joint_num,cfg.output_hm_shape[0],cfg.output_hm_shape[1],cfg.output_hm_shape[2])
+        joint_heatmap1d_1 = self.joint_conv_1(joint_img_feat_1).view(
+            -1, self.joint_num, cfg.output_hm_shape[0]*cfg.output_hm_shape[1]*cfg.output_hm_shape[2])
         joint_img_feat_2 = self.joint_deconv_2(img_feat)
-        joint_heatmap3d_2 = self.joint_conv_2(joint_img_feat_2).view(-1,self.joint_num,cfg.output_hm_shape[0],cfg.output_hm_shape[1],cfg.output_hm_shape[2])
-        joint_heatmap3d = torch.cat((joint_heatmap3d_1, joint_heatmap3d_2),1)
+        joint_heatmap1d_2 = self.joint_conv_2(joint_img_feat_2).view(
+            -1, self.joint_num, cfg.output_hm_shape[0]*cfg.output_hm_shape[1]*cfg.output_hm_shape[2])
+        joint_heatmap1d = torch.cat((joint_heatmap1d_1, joint_heatmap1d_2), 1)
         
         img_feat_gap = F.avg_pool2d(img_feat, (img_feat.shape[2],img_feat.shape[3])).view(-1,2048)
         root_heatmap1d = self.root_fc(img_feat_gap)

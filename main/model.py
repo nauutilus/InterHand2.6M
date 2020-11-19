@@ -56,14 +56,21 @@ class Model(nn.Module):
             loss['hand_type'] = self.hand_type_loss(hand_type, target_hand_type, hand_type_valid)
             return loss
         elif mode == 'test':
+            return joint_heatmap_out
+            
+            '''
             out = {}
+
             idx = torch.argmax(joint_heatmap_out, dim=2, keepdim=True)
             idx_z = idx // (cfg.output_hm_shape[1]*cfg.output_hm_shape[2])
             idx_y = idx % (cfg.output_hm_shape[1]*cfg.output_hm_shape[2]) // cfg.output_hm_shape[2]
-            idx_x = idx % (cfg.output_hm_shape[1]*cfg.output_hm_shape[2]) % cfg.output_hm_shape[2]conda 
+            idx_x = idx % (cfg.output_hm_shape[1]*cfg.output_hm_shape[2]) % cfg.output_hm_shape[2]
+
             joint_z = torch.gather(joint_heatmap_out, dim=2, index=idx_z)
             joint_y = torch.gather(joint_heatmap_out, dim=2, index=idx_y)
             joint_x = torch.gather(joint_heatmap_out, dim=2, index=idx_x)
+
+            joint_coord_out = torch.cat((joint_x, joint_y, joint_z),2).float()
             out['joint_coord'] = joint_coord_out
             out['rel_root_depth'] = rel_root_depth_out
             out['hand_type'] = hand_type
@@ -72,6 +79,7 @@ class Model(nn.Module):
             out['joint_valid'] = joint_valid
             out['hand_type_valid'] = hand_type_valid
             return out
+            '''
 
 def init_weights(m):
     if type(m) == nn.ConvTranspose2d:
